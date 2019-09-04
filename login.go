@@ -11,15 +11,35 @@ import (
 	"time"
 )
 
+var addresse string = "https://wlc1.reseau.uvsq.fr/login.html"
+
 func main() {
-	time.AfterFunc(3 * 1000*1000*1000,func() {
+	getAddresse()
+	login()
+}
+
+func getAddresse() {
+	fmt.Println("Récupération de l'adresse ...")
+	rep, err := http.Get("http://google.com/")
+	if err != nil {
+		panic(err)
+	}
+	loc, err := rep.Location()
+	if err != nil {
+		panic(err)
+	}
+	addresse = loc.Query().Get("switch_url")
+}
+
+func login() {
+	time.AfterFunc(3*1000*1000*1000, func() {
 		fmt.Fprintln(os.Stderr, "Temps écoulé (2s)")
 		os.Exit(1)
 	})
-	rep, err := http.PostForm("https://wlc1.reseau.uvsq.fr/login.html",
+	rep, err := http.PostForm(addresse,
 		url.Values{
-			"username": {"LOGIN"},
-			"password": {"PASSW"},
+			"username":      {"LOGIN"},
+			"password":      {"PASSW"},
 			"buttonClicked": {"4"},
 			"redirect_url":  {"detectportal.firefox.com/success.txt"},
 			"err_flag":      {"0"},

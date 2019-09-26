@@ -6,13 +6,13 @@ package main
 
 import (
 	"./info"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 )
+
+const MAXTIME = 3
 
 var addresse string = "https://wlc1.reseau.uvsq.fr/login.html"
 
@@ -21,36 +21,37 @@ func init() {
 }
 
 func main() {
-	log.Println("loginUVSQ v1.1")
-	// getAddresse()
-	l,p := info.GetInfo()
+	log.Println("loginUVSQ v1.2")
+	getAddresse()
+	l, p := info.GetInfo()
 	login(l, p)
 	info.SaveInfo(l, p)
 }
 
 func getAddresse() {
-	// time.AfterFunc(2*1000*1000*1000, func() {
-	// 	fmt.Fprintln(os.Stderr, "Temps écoulé (2s)")
-	// 	os.Exit(1)
-	// })
+	deadline := time.AfterFunc(MAXTIME*time.Second, func() {
+		log.Fatalf("Temps écoulé (%ds)", MAXTIME)
+	})
+	defer deadline.Stop()
+
 	log.Println("Récupération de l'adresse ...")
 	rep, err := http.Get("http://google.com/")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	loc, err := rep.Location()
 	if err != nil {
-		log.Println("Vous devriez être déjà connecté")
-		os.Exit(0)
+		log.Fatal("Pas d'entête Location: Vous devriez être déjà connecté")
 	}
 	addresse = loc.Query().Get("switch_url")
 }
 
 func login(l, p string) {
-	time.AfterFunc(3*1000*1000*1000, func() {
-		fmt.Fprintln(os.Stderr, "Temps écoulé (3s)")
-		os.Exit(1)
+	deadline := time.AfterFunc(MAXTIME*time.Second, func() {
+		log.Fatalf("Temps écoulé (%ds)", MAXTIME)
 	})
+	defer deadline.Stop()
+
 	log.Println("Envoie des informations")
 	rep, err := http.PostForm(addresse,
 		url.Values{
@@ -64,9 +65,8 @@ func login(l, p string) {
 	if err == nil {
 		log.Println("Connexion validée")
 	} else {
-		fmt.Fprintln(os.Stderr, "Connexion échoué")
 		log.Println("Réponse:", rep)
 		log.Println("Erreur:", err)
-		os.Exit(1)
+		log.Fatal("Connexion échouée")
 	}
 }

@@ -5,13 +5,17 @@
 package info
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
-var mustSaveInfo bool = true
+var (
+	mustSaveInfo = true
+	fileName     = ""
+)
 
 func GetInfo() (l, p string) {
 	if len(constLogin) != 0 && len(constPassword) != 0 {
@@ -28,7 +32,24 @@ func GetInfo() (l, p string) {
 }
 
 func getSavedInfo() (l, p string, ok bool) {
-	return "", "", false
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	log.Print("read file: ", getFileName())
+	file, err := ioutil.ReadFile(getFileName())
+	if err != nil {
+		panic(err)
+	}
+
+	data := bytes.Split(file, []byte{'\n'})
+	if len(data) < 2 {
+		panic("Bad syntax (login puis mot de passe sur deux lignes)")
+	}
+
+	return string(data[0]), string(data[1]), true
 }
 
 func askInfo() (l, p string) {
@@ -41,12 +62,21 @@ func askInfo() (l, p string) {
 
 func SaveInfo(l, p string) {
 	if mustSaveInfo {
-		file := getHome() + ".loginUVSQ.txt"
+		file := getFileName()
 		log.Println("Save Info in: ", file)
 		err := ioutil.WriteFile(file, []byte(l+"\n"+p+"\n"), 0600)
 		if err != nil {
 			log.Fatal("Save Info", err)
 		}
+	}
+}
+
+// The file name where are saved the loggin and passwd
+func getFileName() string {
+	if len(fileName) == 0 {
+		return getHome() + ".loginUVSQ.txt"
+	} else {
+		return fileName
 	}
 }
 

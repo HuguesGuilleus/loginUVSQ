@@ -6,6 +6,7 @@ package main
 
 import (
 	"./info"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -21,11 +22,13 @@ func init() {
 }
 
 func main() {
-	log.Println("loginUVSQ v1.2")
+	log.Println("loginUVSQ v1.3")
 	getAddresse()
 	l, p := info.GetInfo()
 	login(l, p)
 	info.SaveInfo(l, p)
+	fmt.Print("APPUYEZ SUR ENTRER POUR QUITTER ")
+	fmt.Scanf("\n")
 }
 
 func getAddresse() {

@@ -54,9 +54,13 @@ func getSavedInfo() (l, p string, ok bool) {
 
 func askInfo() (l, p string) {
 	fmt.Print("Numéro étudiant: ")
-	fmt.Scanf("%s", &l)
+	for len(l) == 0 {
+		fmt.Scanf("%s", &l)
+	}
 	fmt.Print("Mot de passe: ")
-	fmt.Scanf("%s", &p)
+	for len(p) == 0 {
+		fmt.Scanf("%s", &p)
+	}
 	return
 }
 

@@ -22,7 +22,7 @@ func init() {
 }
 
 func main() {
-	log.Println("loginUVSQ v1.3")
+	log.Println("loginUVSQ v1.4")
 	getAddresse()
 	l, p := info.GetInfo()
 	login(l, p)

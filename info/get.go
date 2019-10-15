@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
+	"os/user"
 )
 
 var (
@@ -84,15 +84,12 @@ func getFileName() string {
 	}
 }
 
-// Get HOME envionment variable
+// Get HOME
 func getHome() string {
-	val, ok := os.LookupEnv("HOME")
-	if ok {
-		return val + "/"
+	u, err := user.Current()
+	if err == nil {
+		return u.HomeDir + "/"
+	} else {
+		return "./"
 	}
-	val, ok = os.LookupEnv("home")
-	if ok {
-		return val + "/"
-	}
-	return "./"
 }

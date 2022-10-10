@@ -5,8 +5,8 @@
 package main
 
 import (
-	"./info"
 	"fmt"
+	"github.com/HuguesGuilleus/loginUVSQ/info"
 	"log"
 	"net/http"
 	"net/url"

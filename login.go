@@ -5,6 +5,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/HuguesGuilleus/loginUVSQ/info"
 	"log"
@@ -22,7 +23,7 @@ func init() {
 }
 
 func main() {
-	log.Println("loginUVSQ v1.4")
+	log.Println("loginUVSQ v1.5")
 	getAddresse()
 	l, p := info.GetInfo()
 	login(l, p)
@@ -50,13 +51,16 @@ func getAddresse() {
 }
 
 func login(l, p string) {
-	deadline := time.AfterFunc(MAXTIME*time.Second, func() {
-		log.Fatalf("Temps écoulé (%ds)", MAXTIME)
-	})
-	defer deadline.Stop()
-
 	log.Println("Envoie des informations")
-	rep, err := http.PostForm(addresse,
+
+	client := http.Client{Transport: &http.Transport{
+		// We use InsecureSkipVerify because the UVSQ TLS certificate are
+		// ofter outdated or wrong configurate.
+		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+		TLSHandshakeTimeout: MAXTIME * time.Second,
+	}}
+
+	rep, err := client.PostForm(addresse,
 		url.Values{
 			"username":      {l},
 			"password":      {p},
